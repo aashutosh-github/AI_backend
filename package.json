@@ -1,0 +1,22 @@
+{
+  "name": "backend_for_ai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aashutosh-github/AI_backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/aashutosh-github/AI_backend/issues"
+  },
+  "homepage": "https://github.com/aashutosh-github/AI_backend#readme",
+  "dependencies": {
+    "express": "5.2.1",
+    "mongoose": "9.8.1"
+  }
+}
