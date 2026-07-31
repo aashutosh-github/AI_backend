@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const signupSchema = z.object({
-  name: z.string().trim().min(3).max(30).toLowerCase(),
+  name: z.string().trim().min(3).max(30),
   age: z.number().min(10).max(100).optional(),
   email: z.preprocess(
     value => (typeof value == "string" ? value.trim().toLowerCase() : ""),
