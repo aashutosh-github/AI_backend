@@ -13,7 +13,7 @@ export const signupSchema = z.object({
     .regex(/[a-z]/, "There should be at least one small letter in password")
     .regex(/[0-9]/, "There should be at least one number in password")
     .regex(
-      /[!@#$%^&*=?""]/,
+      /[^a-zA-Z0-9]/,
       "There should be at least one special letter in password",
     )
     .min(8)
@@ -31,7 +31,7 @@ export const loginSchema = z.object({
     .regex(/[a-z]/, "There should be at least one small letter in password")
     .regex(/[0-9]/, "There should be at least one number in password")
     .regex(
-      /[!@#$%^&*=?""]/,
+      /[^a-zA-Z0-9]/,
       "There should be at least one special letter in password",
     )
     .min(8)
