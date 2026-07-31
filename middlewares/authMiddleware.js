@@ -18,6 +18,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     req.user = {
+      id: existingUser._id,
       name: existingUser.name,
       age: existingUser.age,
       email: existingUser.email,
