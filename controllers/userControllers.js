@@ -1,6 +1,7 @@
 import User from "../model/userSchema.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { signupSchema, loginSchema } from "../validators/userValidators.js";
 
 const cookiesConfig = {
   httpOnly: true,
@@ -20,13 +21,13 @@ const createToken = (id, email) => {
 
 export const signUp = async (req, res) => {
   try {
-    const { name, age, email, password } = req.body;
+    const result = signupSchema.safeParse(req.body);
 
-    if (!name || !email || !password) {
-      return res
-        .status(400)
-        .json({ message: "Name, Email or Password is missing" });
+    if (!result.success) {
+      return res.status(400).json({ error: result.error.issues[0].message });
     }
+
+    const { name, age, email, password } = result.data;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -60,18 +61,21 @@ export const signUp = async (req, res) => {
 
 export const logIn = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const result = loginSchema.safeParse(req.body);
 
-    if (!email || !password) {
+    if (!result.success) {
       return res.status(400).json({ message: "Credentials not provided" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: result.data.email });
     if (!user) {
       return res.status(401).json({ message: `Invalid email or password` });
     }
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    const isPasswordCorrect = await bcrypt.compare(
+      result.data.password,
+      user.password,
+    );
     if (!isPasswordCorrect) {
       return res.status(401).json({ message: "Incorrect credentials" });
     }
