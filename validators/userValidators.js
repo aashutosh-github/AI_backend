@@ -3,7 +3,10 @@ import z from "zod";
 export const signupSchema = z.object({
   name: z.string().trim().min(3).max(30).toLowerCase(),
   age: z.number().min(10).max(100).optional(),
-  email: z.email().trim().toLowerCase(),
+  email: z.preprocess(
+    value => (typeof value == "string" ? value.trim().toLowerCase() : ""),
+    z.email("Email must be valid"),
+  ),
   password: z
     .string()
     .regex(/[A-Z]/, "There should be at least one capital letter in password")
@@ -18,7 +21,10 @@ export const signupSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.email().trim().toLowerCase(),
+  email: z.preprocess(
+    value => (typeof value == "string" ? value.trim().toLowerCase() : ""),
+    z.email("Email must be valid"),
+  ),
   password: z
     .string()
     .regex(/[A-Z]/, "There should be at least one capital letter in password")
