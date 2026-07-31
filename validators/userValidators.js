@@ -1,0 +1,33 @@
+import z from "zod";
+
+export const signupSchema = z.object({
+  name: z.string().trim().min(3).max(30).toLowerCase(),
+  age: z.number().min(10).max(100).optional(),
+  email: z.email().trim().toLowerCase(),
+  password: z
+    .string()
+    .regex(/[A-Z]/, "There should be at least one capital letter in password")
+    .regex(/[a-z]/, "There should be at least one small letter in password")
+    .regex(/[0-9]/, "There should be at least one number in password")
+    .regex(
+      /[!@#$%^&*=?""]/,
+      "There should be at least one special letter in password",
+    )
+    .min(8)
+    .max(30),
+});
+
+export const loginSchema = z.object({
+  email: z.email().trim().toLowerCase(),
+  password: z
+    .string()
+    .regex(/[A-Z]/, "There should be at least one capital letter in password")
+    .regex(/[a-z]/, "There should be at least one small letter in password")
+    .regex(/[0-9]/, "There should be at least one number in password")
+    .regex(
+      /[!@#$%^&*=?""]/,
+      "There should be at least one special letter in password",
+    )
+    .min(8)
+    .max(30),
+});
