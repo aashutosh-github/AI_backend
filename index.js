@@ -3,6 +3,7 @@ import express from "express";
 import connectDB from "./config/mongoose.js";
 import userRouter from "./routes/userRouter.js";
 import chatRouter from "./routes/chatRouter.js";
+import messageRouter from "./routes/messageRouter.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -13,6 +14,7 @@ app.use(cookieParser());
 
 app.use("/user", userRouter);
 app.use("/chat", chatRouter);
+app.use("/msg", messageRouter);
 
 const startServer = async () => {
   try {
