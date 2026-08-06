@@ -31,16 +31,22 @@ export const sendMessage = async (req, res) => {
       return res.status(400).json({ message: "Data not provided" });
     }
 
-    const chat = await Chat.findOne({ _id: chatId, userId: req.user.id });
-    if (!chat) {
-      return res.status(404).json({ message: "Chat not found" });
+    let chat;
+
+    if (chatId) {
+      chat = await Chat.findOne({ _id: chatId, userId: req.user.id });
+      if (!chat) {
+        return res.status(404).json({ message: "Chat not found" });
+      }
+    } else {
+      chat = await Chat.create({ userId: req.user.id });
     }
 
     const userMessage = await Message.create({
       userId: req.user.id,
       chatId: chat._id,
       role: "user",
-      content: content,
+      content: content.trim(),
     });
 
     // send this content to our AI model
@@ -53,6 +59,14 @@ export const sendMessage = async (req, res) => {
       role: "model",
       content: dummyReply,
     });
+
+    chat.messageCount += 2;
+
+    if (chat.topic === "New Chat") {
+      chat.topic = content.trim().slice(0, 30);
+    }
+
+    await chat.save();
 
     return res.status(201).json({ message: dummyReply });
   } catch (err) {
