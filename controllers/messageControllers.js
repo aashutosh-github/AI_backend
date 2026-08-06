@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Chat from "../model/chatSchema.js";
 import Message from "../model/messageSchema.js";
 
@@ -34,6 +35,9 @@ export const sendMessage = async (req, res) => {
     let chat;
 
     if (chatId) {
+      if (!mongoose.Types.ObjectId.isValid(chatId)) {
+        return res.status(400).json({ message: "Incorrect format of chat id" });
+      }
       chat = await Chat.findOne({ _id: chatId, userId: req.user.id });
       if (!chat) {
         return res.status(404).json({ message: "Chat not found" });
