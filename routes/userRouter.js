@@ -8,5 +8,6 @@ userRouter.post("/signup", userController.signUp);
 userRouter.post("/login", userController.logIn);
 userRouter.post("/profile", authMiddleware, userController.profile);
 userRouter.post("/logout", userController.logOut);
+userRouter.delete("/delete", authMiddleware, userController.deleteProfile);
 
 export default userRouter;

@@ -2,6 +2,8 @@ import User from "../model/userSchema.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { signupSchema, loginSchema } from "../validators/userValidators.js";
+import Chat from "../model/chatSchema.js";
+import Message from "../model/messageSchema.js";
 
 const cookiesConfig = {
   httpOnly: true,
@@ -119,6 +121,28 @@ export const profile = async (req, res) => {
       email: req.user.email,
       usage: req.user.usage,
     });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteProfile = async (req, res) => {
+  try {
+    const { _id: userId } = req.user;
+
+    await Message.deleteMany({ userId });
+    await Chat.deleteOne({ userId });
+    await User.deleteOne({ _id: userId });
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+    });
+
+    return res
+      .status(200)
+      .json({ message: "user profile deleted successfully" });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });
