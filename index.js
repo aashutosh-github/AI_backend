@@ -1,12 +1,10 @@
-import dotenv from "dotenv";
+import "dotenv/config";
 import express from "express";
 import connectDB from "./config/mongoose.js";
 import userRouter from "./routes/userRouter.js";
 import chatRouter from "./routes/chatRouter.js";
 import messageRouter from "./routes/messageRouter.js";
 import cookieParser from "cookie-parser";
-
-dotenv.config();
 
 const app = express();
 app.use(express.json());
