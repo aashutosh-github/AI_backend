@@ -71,7 +71,7 @@ export const logIn = async (req, res) => {
 
     const user = await User.findOne({ email: result.data.email });
     if (!user) {
-      return res.status(401).json({ message: `Invalid email or password` });
+      return res.status(401).json({ message: `Invalid credentials` });
     }
 
     const isPasswordCorrect = await bcrypt.compare(
@@ -129,10 +129,10 @@ export const profile = async (req, res) => {
 
 export const deleteProfile = async (req, res) => {
   try {
-    const { _id: userId } = req.user;
+    const { id: userId } = req.user;
 
     await Message.deleteMany({ userId });
-    await Chat.deleteOne({ userId });
+    await Chat.deleteMany({ userId });
     await User.deleteOne({ _id: userId });
 
     res.clearCookie("token", {
