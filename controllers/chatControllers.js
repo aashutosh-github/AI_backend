@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Chat from "../model/chatSchema.js";
 import Message from "../model/messageSchema.js";
 
@@ -40,11 +41,13 @@ export const deleteChat = async (req, res) => {
   try {
     const { chatId } = req.params;
 
+    if (!chatId || !mongoose.Types.ObjectId.isValid(chatId)) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
     const chat = await Chat.findOne({ _id: chatId, userId: req.user.id });
     if (!chat) {
-      return res
-        .status(403)
-        .json({ message: "You are not authorized to perform this action" });
+      return res.status(403).json({ message: "Invalid credentials" });
     }
 
     await Message.deleteMany({ chatId: chat._id });
