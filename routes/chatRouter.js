@@ -6,8 +6,8 @@ const chatRouter = express.Router();
 
 chatRouter.use(authMiddleware);
 
-chatRouter.post("/createChat", chatController.createChat);
-chatRouter.get("/getRecentChats", chatController.getRecentChats);
+chatRouter.post("/create", chatController.createChat);
+chatRouter.get("/recents", chatController.getRecentChats);
 chatRouter.delete(":chatId", chatController.deleteChat);
 chatRouter.get(":chatId", chatController.getSingleChat);
 
