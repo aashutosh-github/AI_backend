@@ -8,7 +8,7 @@ chatRouter.use(authMiddleware);
 
 chatRouter.post("/create", chatController.createChat);
 chatRouter.get("/recents", chatController.getRecentChats);
-chatRouter.delete(":chatId", chatController.deleteChat);
-chatRouter.get(":chatId", chatController.getSingleChat);
+chatRouter.delete("/:chatId", chatController.deleteChat);
+chatRouter.get("/:chatId", chatController.getSingleChat);
 
 export default chatRouter;
