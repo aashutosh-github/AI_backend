@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Chat from "../model/chatSchema.js";
 import Message from "../model/messageSchema.js";
 
-export const getMessage = async (req, res) => {
+export const getAllMessages = async (req, res) => {
   try {
     const { chatId } = req.params;
 
@@ -72,7 +72,7 @@ export const sendMessage = async (req, res) => {
 
     await chat.save();
 
-    return res.status(201).json({ message: dummyReply });
+    return res.status(201).json({ message: modelMessage });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });
