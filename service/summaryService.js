@@ -14,7 +14,7 @@ Only summarize the conversation content.
 const summaryChunk = 20;
 
 export const updateSummaryIfNeeded = async chatId => {
-  const chat = await Chat.find({ _id: chatId });
+  const chat = await Chat.findOne({ _id: chatId });
   if (!chat) {
     throw new Error("No such chat found");
   }
@@ -36,18 +36,22 @@ export const updateSummaryIfNeeded = async chatId => {
   }));
 
   const result = await gemini.interactions.create({
-    model: process.env.GEMINI_NO_THIKING_MODEL,
+    model: process.env.GEMINI_NO_THINKING_MODEL,
     system_instruction: systemPrompt,
     input: messages,
     response_format: {
-      type: "object",
-      properties: {
-        summary: {
-          type: "string",
-          description: "A summary of provided messages",
+      type: "text",
+      mime_type: "application/json",
+      schema: {
+        type: "object",
+        properties: {
+          summary: {
+            type: "string",
+            description: "A summary of provided messages",
+          },
         },
+        required: ["summary"],
       },
-      required: ["summary"],
     },
   });
 

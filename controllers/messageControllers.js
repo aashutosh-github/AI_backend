@@ -10,6 +10,7 @@ import { addChatTokenUsage } from "../utils/chatTokenUsage.js";
 import { buildContextForAi } from "../utils/buildContext.js";
 import { generateAiResponse } from "../service/geminiService.js";
 import { updateSummaryIfNeeded } from "../service/summaryService.js";
+import { generateTitle } from "../service/titleService.js";
 
 export const getAllMessages = async (req, res) => {
   try {
@@ -51,6 +52,7 @@ export const sendMessage = async (req, res) => {
     }
 
     let chat;
+    let isFirstMessage = false;
 
     if (chatId) {
       if (!mongoose.Types.ObjectId.isValid(chatId)) {
@@ -71,15 +73,30 @@ export const sendMessage = async (req, res) => {
     const messages = buildContextForAi(chat, messagesToBeSent, content.trim());
 
     const aiReply = await generateAiResponse(messages);
+    let title = "New Chat";
 
-    const userMessage = await Message.create({
+    isFirstMessage = chat.messageCount === 0;
+    if (isFirstMessage) {
+      const result = await generateTitle(content.trim());
+      chat.topic = result.output;
+      title = result.output;
+      await addChatTokenUsage(chat, result.usage);
+      await addUserTokenUsage(req.user, result.usage.totalTokens);
+    }
+
+    res.status(200).json({
+      output: aiReply.modelReply,
+      title,
+    });
+
+    await Message.create({
       userId: req.user._id,
       chatId: chat._id,
       role: "user_input",
       content: content.trim(),
     });
 
-    const modelMessage = await Message.create({
+    await Message.create({
       userId: req.user._id,
       chatId: chat._id,
       role: "model_output",
@@ -93,17 +110,9 @@ export const sendMessage = async (req, res) => {
 
     chat.messageCount += 2;
 
-    if (chat.topic === "New Chat" && chat.messageCount >= 2) {
-      chat.topic = content.trim().slice(0, 30);
-    }
-
     await addChatTokenUsage(chat, aiReply.usage);
     await addUserTokenUsage(req.user, aiReply.usage.totalTokens);
     await chat.save();
-
-    res.status(200).json({
-      output: aiReply.modelReply,
-    });
 
     await updateSummaryIfNeeded(chat._id);
   } catch (err) {
