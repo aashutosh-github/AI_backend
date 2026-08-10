@@ -93,12 +93,12 @@ export const generateAiResponse = async messages => {
   const completionTokens = outputData.usage?.total_output_tokens;
   const totalTokens = outputData.usage?.total_tokens;
 
-  return res.status(200).json({
+  return {
     modelReply,
     usage: {
       promptTokens,
       completionTokens,
       totalTokens,
     },
-  });
+  };
 };

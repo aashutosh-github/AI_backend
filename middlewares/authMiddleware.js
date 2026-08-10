@@ -17,15 +17,9 @@ const authMiddleware = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    req.user = {
-      id: existingUser._id,
-      name: existingUser.name,
-      age: existingUser.age,
-      email: existingUser.email,
-      usage: existingUser.usage,
-    };
+    req.user = existingUser;
 
-    next();
+    return next();
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });

@@ -15,13 +15,13 @@ export const getAllMessages = async (req, res) => {
   try {
     const { chatId } = req.params;
 
-    const chat = await Chat.findOne({ _id: chatId, userId: req.user.id });
+    const chat = await Chat.findOne({ _id: chatId, userId: req.user._id });
     if (!chat) {
       return res.status(404).json({ message: "No such chat found" });
     }
 
     const returnedMessages = await Message.find({
-      userId: req.user.id,
+      userId: req.user._id,
       chatId: chatId,
     }).sort({ createdAt: 1 });
 
@@ -56,12 +56,12 @@ export const sendMessage = async (req, res) => {
       if (!mongoose.Types.ObjectId.isValid(chatId)) {
         return res.status(400).json({ message: "Incorrect format of chat id" });
       }
-      chat = await Chat.findOne({ _id: chatId, userId: req.user.id });
+      chat = await Chat.findOne({ _id: chatId, userId: req.user._id });
       if (!chat) {
         return res.status(404).json({ message: "Chat not found" });
       }
     } else {
-      chat = await Chat.create({ userId: req.user.id });
+      chat = await Chat.create({ userId: req.user._id });
     }
 
     const messagesToBeSent = await Message.find({ chatId })
@@ -73,17 +73,22 @@ export const sendMessage = async (req, res) => {
     const aiReply = await generateAiResponse(messages);
 
     const userMessage = await Message.create({
-      userId: req.user.id,
+      userId: req.user._id,
       chatId: chat._id,
       role: "user_input",
       content: content.trim(),
     });
 
     const modelMessage = await Message.create({
-      userId: req.user.id,
+      userId: req.user._id,
       chatId: chat._id,
       role: "model_output",
-      content: aiReply,
+      content: aiReply.modelReply,
+      usage: {
+        promptTokens: parseInt(aiReply.usage.promptTokens),
+        completionTokens: parseInt(aiReply.usage.completionTokens),
+        totalTokens: parseInt(aiReply.usage.totalTokens),
+      },
     });
 
     chat.messageCount += 2;
@@ -97,8 +102,6 @@ export const sendMessage = async (req, res) => {
     await chat.save();
 
     res.status(200).json({
-      userMessage,
-      modelMessage,
       output: aiReply.modelReply,
     });
 

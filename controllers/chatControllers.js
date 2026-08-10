@@ -4,7 +4,7 @@ import Message from "../model/messageSchema.js";
 
 export const getRecentChats = async (req, res) => {
   try {
-    const chats = await Chat.find({ userId: req.user.id })
+    const chats = await Chat.find({ userId: req.user._id })
       .select("topic updatedAt")
       .sort({ updatedAt: -1 })
       .limit(20);
@@ -21,7 +21,7 @@ export const getRecentChats = async (req, res) => {
 
 export const createChat = async (req, res) => {
   try {
-    const createdChat = await Chat.create({ userId: req.user.id });
+    const createdChat = await Chat.create({ userId: req.user._id });
     res.status(201).json({
       message: "Chat created successfully",
       chat: {
@@ -45,7 +45,7 @@ export const deleteChat = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const chat = await Chat.findOne({ _id: chatId, userId: req.user.id });
+    const chat = await Chat.findOne({ _id: chatId, userId: req.user._id });
     if (!chat) {
       return res.status(403).json({ message: "Invalid credentials" });
     }
@@ -66,7 +66,7 @@ export const getSingleChat = async (req, res) => {
 
     const chat = await Chat.findOne({
       _id: chatId,
-      userId: req.user.id,
+      userId: req.user._id,
     });
     if (!chat) {
       return res.status(404).json({ message: "No such chat found" });

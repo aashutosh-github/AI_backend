@@ -2,7 +2,7 @@ export const resetTokenIfNeeded = async user => {
   const nowTime = new Date();
   if (nowTime >= user.usage.resetAt) {
     user.usage.tokenUsed = 0;
-    user.usage.tokenLimit = new Date(Date.now() + 5 * 60 * 60 * 1000);
+    user.usage.resetAt = new Date(Date.now() + 5 * 60 * 60 * 1000);
     await user.save();
   }
 };
@@ -14,4 +14,5 @@ export const hasTokenLimitReached = user => {
 export const addUserTokenUsage = async (user, token) => {
   user.usage.tokenUsed += token;
   user.usage.totalTokenUsed += token;
+  await user.save();
 };
