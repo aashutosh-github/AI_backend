@@ -87,6 +87,7 @@ export const sendMessage = async (req, res) => {
     res.status(200).json({
       output: aiReply.modelReply,
       title,
+      chatId: chat._id,
     });
 
     await Message.create({
