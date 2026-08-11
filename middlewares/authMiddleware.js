@@ -22,7 +22,13 @@ const authMiddleware = async (req, res, next) => {
     return next();
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Internal server error" });
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Please login again" });
+    }
+    if (err.name === "JsonWebTokenError") {
+      return res.status(403).json({ message: "Token was tampered." });
+    }
+    return res.status(500).json({ message: "Failed to authenticate token" });
   }
 };
 
