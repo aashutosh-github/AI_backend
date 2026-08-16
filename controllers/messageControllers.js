@@ -10,7 +10,6 @@ import { addChatTokenUsage } from "../utils/chatTokenUsage.js";
 import { buildContextForAi } from "../utils/buildContext.js";
 import { generateAiResponse } from "../service/geminiService.js";
 import { updateSummaryIfNeeded } from "../service/summaryService.js";
-import { generateTitle } from "../service/titleService.js";
 
 export const getAllMessages = async (req, res) => {
   try {
@@ -73,20 +72,15 @@ export const sendMessage = async (req, res) => {
     const messages = buildContextForAi(chat, messagesToBeSent, content.trim());
 
     const aiReply = await generateAiResponse(messages);
-    let title = "New Chat";
 
     isFirstMessage = chat.messageCount === 0;
     if (isFirstMessage) {
-      const result = await generateTitle(content.trim());
-      chat.topic = result.output;
-      title = result.output;
-      await addChatTokenUsage(chat, result.usage);
-      await addUserTokenUsage(req.user, result.usage.totalTokens);
+      const topic = content.trim().slice(0, 40);
+      chat.topic = topic;
     }
 
     res.status(200).json({
       output: aiReply.modelReply,
-      title,
       chatId: chat._id,
     });
 
