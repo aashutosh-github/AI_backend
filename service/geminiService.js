@@ -13,7 +13,7 @@ export const generateAiResponse = async messages => {
     input: messages,
   });
 
-  if (!result || result?.status !== "completed") {
+  if (!result || result?.status === "failed") {
     throw new Error("No result could be obtained");
   }
 
