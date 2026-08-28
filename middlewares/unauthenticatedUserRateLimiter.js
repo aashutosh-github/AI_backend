@@ -1,6 +1,6 @@
 // I will only allow 10 requests/min on unauthorized user requests
 
-import { redisClient } from "../config/redis";
+import { redisClient } from "../config/redis.js";
 
 const unauthenticatedRateLimiter = async (req, res, next) => {
   try {
@@ -12,7 +12,7 @@ const unauthenticatedRateLimiter = async (req, res, next) => {
     }
 
     if (requestCount > 10) {
-      const remainingTime = redisClient.ttl(key);
+      const remainingTime = await redisClient.ttl(key);
       return res
         .status(429)
         .json({ message: `please try after ${remainingTime} seconds` });
