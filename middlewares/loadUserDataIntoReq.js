@@ -6,7 +6,7 @@ const loadUserDataIntoReq = async (req, res, next) => {
     const { token } = req.cookies;
     const payload = jwt.decode(token);
 
-    const user = await User.findById(payload.id);
+    const user = await User.findById(payload.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: `User does not exist` });
     }
