@@ -1,11 +1,7 @@
 import mongoose from "mongoose";
 import Chat from "../model/chatSchema.js";
 import Message from "../model/messageSchema.js";
-import {
-  resetTokenIfNeeded,
-  hasTokenLimitReached,
-  addUserTokenUsage,
-} from "../utils/userUsage.js";
+import { addUserTokenUsage } from "../utils/userUsage.js";
 import { addChatTokenUsage } from "../utils/chatTokenUsage.js";
 import { buildContextForAi } from "../utils/buildContext.js";
 import { generateAiResponse } from "../service/geminiService.js";
@@ -40,16 +36,6 @@ export const sendMessage = async (req, res) => {
     if (!content || content.trim() === "") {
       return res.status(400).json({ message: "Data not provided" });
     }
-
-    await resetTokenIfNeeded(req.user);
-
-    if (hasTokenLimitReached(req.user)) {
-      return res.status(429).json({
-        message: `Token limit exceeded`,
-        usage: req.user.usage,
-      });
-    }
-
     let chat;
     let isFirstMessage = false;
 
@@ -96,11 +82,7 @@ export const sendMessage = async (req, res) => {
       chatId: chat._id,
       role: "model_output",
       content: aiReply.modelReply,
-      usage: {
-        promptTokens: parseInt(aiReply.usage.promptTokens),
-        completionTokens: parseInt(aiReply.usage.completionTokens),
-        totalTokens: parseInt(aiReply.usage.totalTokens),
-      },
+      totalTokens: parseInt(aiReply.usage.totalTokens),
     });
 
     chat.messageCount += 2;

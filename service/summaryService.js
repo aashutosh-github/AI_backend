@@ -54,16 +54,12 @@ export const updateSummaryIfNeeded = async chatId => {
   chat.summaryUpdatedAt = new Date();
   chat.summarizedTillMessageNumber += messagesToBeSummarized.length;
 
-  chat.usage.totalTokens += result.input_tokens;
-  chat.usage.promptTokens += result.input_tokens;
-  chat.usage.completionTokens += result.input_tokens;
-
+  chat.totalTokens += result.input_tokens;
   await chat.save();
 
   const user = await User.findById(chat.userId);
   if (user) {
-    user.usage.tokenUsed += result.input_tokens;
-    user.usage.totalTokenUsed += result.input_tokens;
+    user.totalTokenUsed += result.input_tokens;
     await user.save();
   }
 };
