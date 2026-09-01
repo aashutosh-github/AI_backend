@@ -6,6 +6,7 @@ import { addChatTokenUsage } from "../utils/chatTokenUsage.js";
 import { buildContextForAi } from "../utils/buildContext.js";
 import { generateAiResponse } from "../service/geminiService.js";
 import { updateSummaryIfNeeded } from "../service/summaryService.js";
+import { redisClient } from "../config/redis.js";
 
 export const getAllMessages = async (req, res) => {
   try {
@@ -91,6 +92,20 @@ export const sendMessage = async (req, res) => {
     });
 
     chat.messageCount += 2;
+
+    // save usage data to redis
+    const tokenUsed = await redisClient.incrBy(
+      req.tokenUsageKey,
+      Number(aiReply.usage.totalTokens),
+    );
+
+    if (tokenUsed === aiReply.usage.totalTokens) {
+      // this means that this was the first time the usage limit is being set in redis
+      await redisClient.expire(
+        req.tokenUsageKey,
+        Number(process.env.REDIS_TOKEN_LIMIT_HOURS) * 60 * 60,
+      );
+    }
 
     await addChatTokenUsage(chat, aiReply.usage);
     await addUserTokenUsage(req.user, aiReply.usage.totalTokens);
