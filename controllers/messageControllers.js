@@ -57,7 +57,12 @@ export const sendMessage = async (req, res) => {
 
     const messages = buildContextForAi(chat, messagesToBeSent, content.trim());
 
-    const aiReply = await generateAiResponse(messages);
+    const userInfo = {
+      name: req.user.name,
+      age: req.user.age,
+    };
+
+    const aiReply = await generateAiResponse(messages, userInfo);
 
     isFirstMessage = chat.messageCount === 0;
     if (isFirstMessage) {
