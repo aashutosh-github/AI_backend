@@ -1,4 +1,5 @@
 import { redisClient } from "../config/redis.js";
+import normalizeTime from "../utils/normalizeTime.js";
 
 const authenticatedUserRateLimiter = async (req, res, next) => {
   try {
@@ -12,7 +13,8 @@ const authenticatedUserRateLimiter = async (req, res, next) => {
     }
 
     if (limit > 20) {
-      const remainingTime = await redisClient.ttl(key);
+      let remainingTime = await redisClient.ttl(key);
+      remainingTime = normalizeTime(remainingTime);
       return res.status(429).json({
         message: `Too many requests, please try after ${remainingTime} seconds`,
       });

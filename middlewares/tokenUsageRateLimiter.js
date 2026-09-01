@@ -1,4 +1,5 @@
 import { redisClient } from "../config/redis.js";
+import normalizeTime from "../utils/normalizeTime.js";
 
 const tokenUsageRateLimiter = async (req, res, next) => {
   try {
@@ -7,12 +8,13 @@ const tokenUsageRateLimiter = async (req, res, next) => {
     const tokenLimit = Number(process.env.MAX_TOKEN_LIMIT);
 
     if (Number(tokenUsed || 0) >= tokenLimit) {
-      const remainingTime = await redisClient.ttl(key);
+      let remainingTime = await redisClient.ttl(key);
+      remainingTime = normalizeTime(remainingTime);
       return res.status(429).json({
         message: `Token usage limit exceeded`,
         tokenUsed,
         tokenLimit,
-        retryAfter: `${remainingTime} seconds`,
+        retryAfter: `${remainingTime}`,
       });
     }
     req.tokenUsageKey = key;
