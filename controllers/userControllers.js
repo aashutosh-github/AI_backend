@@ -119,7 +119,7 @@ export const profile = async (req, res) => {
       name: req.user.name,
       age: req.user.age,
       email: req.user.email,
-      usage: req.user.usage,
+      totalTokenUsed: req.user.totalTokenUsed,
     });
   } catch (err) {
     console.error(err);
