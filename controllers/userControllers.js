@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import { signupSchema, loginSchema } from "../validators/userValidators.js";
 import Chat from "../model/chatSchema.js";
 import Message from "../model/messageSchema.js";
+import { redisClient } from "../config/redis.js";
 
 const cookiesConfig = {
   httpOnly: true,
@@ -102,6 +103,23 @@ export const logIn = async (req, res) => {
 
 export const logOut = async (req, res) => {
   try {
+    const token = req.token;
+    const payload = req.tokenPayload;
+    const currentTime = Math.floor(Date.now() / 1000);
+    const remainingTime = payload.exp - currentTime;
+    console.log("payload: ", payload);
+
+    if (remainingTime > 0) {
+      const result = await redisClient.set(
+        `token-blocked:${token}`,
+        "blocked",
+        {
+          ex: remainingTime,
+        },
+      );
+      console.log("result: ", result);
+    }
+
     res.clearCookie("token", {
       httpOnly: true,
       secure: false,
@@ -135,6 +153,15 @@ export const deleteProfile = async (req, res) => {
     await Chat.deleteMany({ userId });
     await User.deleteOne({ _id: userId });
 
+    const token = req.token;
+    const payload = req.tokenPayload;
+    const currentTime = Math.floor(Date.now() / 1000);
+    const remainingTime = payload.exp - currentTime;
+    if (remainingTime > 0) {
+      await redisClient.set(`token-blocked:${token}`, "blocked", {
+        ex: remainingTime,
+      });
+    }
     res.clearCookie("token", {
       httpOnly: true,
       secure: false,

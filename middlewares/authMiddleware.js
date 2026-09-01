@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { redisClient } from "../config/redis.js";
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -9,6 +10,14 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    // checking for blocked token after verifying existing token because we do not want to
+    // hit redis for every request, some will be rejected by verify step already
+    const blockedToken = await redisClient.get(`token-blocked:${token}`);
+    console.log(blockedToken);
+    if (blockedToken) {
+      return res.status(401).json({ message: `Please login again` });
+    }
 
     req.userId = payload.id;
     req.token = token;
