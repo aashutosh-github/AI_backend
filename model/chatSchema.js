@@ -33,21 +33,9 @@ const chatSchema = new mongoose.Schema(
       default: 0,
     },
 
-    usage: {
-      promptTokens: {
-        type: Number,
-        default: 0,
-      },
-
-      completionTokens: {
-        type: Number,
-        default: 0,
-      },
-
-      totalTokens: {
-        type: Number,
-        default: 0,
-      },
+    totalTokens: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true },
