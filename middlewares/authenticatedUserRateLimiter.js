@@ -1,10 +1,8 @@
-import jwt from "jsonwebtoken";
 import { redisClient } from "../config/redis.js";
 
 const authenticatedUserRateLimiter = async (req, res, next) => {
   try {
-    const { token } = req.cookies;
-    const payload = jwt.decode(token);
+    const payload = req.tokenPayload;
     const key = `rate-limit:user-id:${payload.id}`;
 
     const limit = await redisClient.incr(key);

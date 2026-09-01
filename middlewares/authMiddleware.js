@@ -8,7 +8,11 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ message: "User not logged in" });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.userId = payload.id;
+    req.token = token;
+    req.tokenPayload = payload;
 
     next();
   } catch (err) {

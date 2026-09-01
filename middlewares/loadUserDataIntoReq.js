@@ -1,10 +1,8 @@
-import jwt from "jsonwebtoken";
 import User from "../model/userSchema.js";
 
 const loadUserDataIntoReq = async (req, res, next) => {
   try {
-    const { token } = req.cookies;
-    const payload = jwt.decode(token);
+    const payload = req.tokenPayload;
 
     const user = await User.findById(payload.id).select("-password");
     if (!user) {
