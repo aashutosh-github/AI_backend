@@ -14,7 +14,6 @@ const authMiddleware = async (req, res, next) => {
     // checking for blocked token after verifying existing token because we do not want to
     // hit redis for every request, some will be rejected by verify step already
     const blockedToken = await redisClient.get(`token-blocked:${token}`);
-    console.log(blockedToken);
     if (blockedToken) {
       return res.status(401).json({ message: `Please login again` });
     }

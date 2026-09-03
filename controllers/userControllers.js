@@ -107,7 +107,6 @@ export const logOut = async (req, res) => {
     const payload = req.tokenPayload;
     const currentTime = Math.floor(Date.now() / 1000);
     const remainingTime = payload.exp - currentTime;
-    console.log("payload: ", payload);
 
     if (remainingTime > 0) {
       const result = await redisClient.set(
@@ -117,7 +116,6 @@ export const logOut = async (req, res) => {
           ex: remainingTime,
         },
       );
-      console.log("result: ", result);
     }
 
     res.clearCookie("token", {
