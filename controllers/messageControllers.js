@@ -63,7 +63,24 @@ export const sendMessage = async (req, res) => {
       age: req.user.age,
     };
 
+    const chatLock = await redisClient.set(
+      `chat-lock:id:${req.userId}`,
+      "locked",
+      {
+        condition: "NX",
+        expiration: {
+          type: "EX",
+          value: 60,
+        },
+      },
+    );
+    if (chatLock === null) {
+      return res.status(429).json({
+        message: `Another one of your requests is being processed. Kindly wait for it to be completed before trying again.`,
+      });
+    }
     const aiReply = await generateAiResponse(messages, userInfo);
+    await redisClient.del(`chat-lock:id:${req.userId}`);
 
     isFirstMessage = chat.messageCount === 0;
     if (isFirstMessage) {
