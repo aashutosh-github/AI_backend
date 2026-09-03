@@ -18,6 +18,7 @@ An extensible Node.js backend for an authenticated AI chat application. It combi
 - **Recent chat management**, including chat creation, retrieval, and deletion.
 - **Context-aware AI requests** containing previous messages and optional summaries.
 - **Automatic summarization** of longer conversations through the ScaleDown summarization API.
+- **Request Locking**, only one request is processed at once, prevents rate limit abuse by sending multiple requests at the same time from different tabs
 - **Usage tracking** at both the user and chat level.
 - **MongoDB indexes** for common chat and message retrieval patterns.
 
