@@ -37,6 +37,13 @@ export const sendMessage = async (req, res) => {
     if (!content || content.trim() === "") {
       return res.status(400).json({ message: "Data not provided" });
     }
+
+    if (content.length >= 1500) {
+      return res.status(400).json({
+        message: `Content size too big`,
+      });
+    }
+
     let chat;
     let isFirstMessage = false;
 
